@@ -30,7 +30,7 @@ const config = {
         transferToSupport: 'Entendido. Nossa equipe técnica já foi notificada sobre o seu problema e entrará em contato em breve para agendar um reparo. Por favor, aguarde um momento. 🧑‍🔧',
         transferToHumanForTv: "Ótimo! Um de nossos especialistas já foi notificado sobre seu interesse no plano de TV e entrará em contato em breve. Por favor, aguarde um momento. 🧑‍💼",
         thankYouReply: 'De nada! 😊 Se precisar de mais alguma coisa, é só chamar!',
-        ourPlans: '📦 *Nossos Planos de Internet – RW Fibra:*\n\n' + '🚀 *200 Mega* – R$ 49,90/mês*\n✅ Ideal para navegação básica e streaming.\n\n' + '� *300 Mega* – R$ 79,90/mês\n✅ Perfeito para quem usa vários dispositivos.\n\n' + '🚀 *400 Mega* – R$ 100,00/mês\n✅ Ótima opção para home office e gamers.\n\n' + '🚀 *500 Mega + TV* – R$ 120,00/mês\n✅ Inclui +200 canais de TV grátis!\n\n' + '📌 *Promoção:* Plano de 200 Mega por R$ 49,90 nos dois primeiros meses. Após, R$ 79,90/mês.\n\n' + 'Qual desses planos mais combina com você? Me diga qual a velocidade que te interessou! 😉',
+        ourPlans: '📦 *Nossos Planos de Internet – RW Fibra:*\n\n' + '🚀 *200 Mega* – R$ 49,90/mês*\n✅ Ideal para navegação básica e streaming.\n\n' + '🚀 *300 Mega* – R$ 79,90/mês\n✅ Perfeito para quem usa vários dispositivos.\n\n' + '🚀 *400 Mega* – R$ 100,00/mês\n✅ Ótima opção para home office e gamers.\n\n' + '🚀 *500 Mega + TV* – R$ 120,00/mês\n✅ Inclui +200 canais de TV grátis!\n\n' + '📌 *Promoção:* Plano de 200 Mega por R$ 49,90 nos dois primeiros meses. Após, R$ 79,90/mês.\n\n' + 'Qual desses planos mais combina com você? Me diga qual a velocidade que te interessou! 😉',
         reminder: 'Olá! Vi que você está de olho nos nossos planos. 👀\n\nQual deles te interessou mais? Me diga a velocidade ou pode perguntar que eu te ajudo. 😊',
         planChoiceError: 'Desculpe, não identifiquei um plano. Por favor, me diga qual dos planos você prefere (*200, 300, 400 ou 500 Mega*) para continuarmos. 😊',
         askForName: "Ótima escolha! Para começarmos, por favor, digite seu *nome completo*.",
@@ -387,4 +387,3 @@ async function handleFinancialRequest(userId, chat) {
     await chat.sendStateTyping(); await randomDelay();
     await sendBotMessage(userId, config.messages.financialInfo);
 }
-�
