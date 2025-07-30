@@ -1,0 +1,12 @@
+{
+  "name": "bot-daniele",
+  "version": "1.0.0",
+  "description": "Chatbot de atendimento para WhatsApp",
+  "main": "chatbot.js",
+  "scripts": {
+    "start": "node chatbot.js"
+  },
+  "dependencies": {
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.16.6"
+  }
