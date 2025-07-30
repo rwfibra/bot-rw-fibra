@@ -1,5 +1,6 @@
 // Importação das dependências necessárias
-const qrcode = require('qrcode-terminal');
+const qrcodeTerminal = require('qrcode-terminal');
+const qrcode = require('qrcode'); // Nova ferramenta para gerar o link
 const { Client, MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
 const fetch = require('node-fetch');
@@ -42,7 +43,7 @@ const config = {
         askForAddressNumber: (street, neighborhood) => `Encontrei o endereço: *${street}, ${neighborhood}*.\n\nPara confirmar, por favor, digite apenas o *número da sua casa* e o complemento (se houver).`,
         supportMenu: 'Entendido! Para agilizar, me diga qual o problema:\n\n1️⃣ *Internet Lenta ou caindo*\n2️⃣ *Sem conexão com a internet*',
         supportInstruction: 'Certo. Um procedimento que resolve a maioria dos casos é reiniciar o seu modem/roteador.\n\nPor favor, *desligue o equipamento da tomada, aguarde 30 segundos e ligue-o novamente*. Aguarde as luzes se estabilizarem.\n\nO problema foi resolvido? Responda com *sim* ou *não*.',
-        supportResolved: 'Que ótimo! Fico feliz em ajudar. Se precisar de mais alguma coisa, é só chamar! 😊',
+        supportResolved: 'Que ótimo! Fico feliz em ajudar. Se precisar de mais alguma coisa, é só chamar! �',
         supportNotResolved: 'Poxa, que pena. Mas não se preocupe!',
         signalBoost: '✅ Entendido! Vou mandar um reforço de sinal para sua conexão... um momento, por favor.',
         signalBoostConfirmation: 'Prontinho! O reforço de sinal foi enviado. Por favor, verifique se sua conexão melhorou.\n\nO problema foi resolvido? Responda com *sim* ou *não*.',
@@ -97,8 +98,19 @@ async function sendBotMessage(userId, message, mediaOptions = null) {
 // ===================================================================================
 // INICIALIZAÇÃO DO CLIENTE WHATSAPP
 // ===================================================================================
-client.on('qr', qr => { 
-    qrcode.generate(qr, { small: true }); 
+client.on('qr', qr => {
+    console.log('[QR CODE] Link para leitura abaixo:');
+    qrcode.toDataURL(qr, (err, url) => {
+        if(err) {
+            console.error('[QR CODE] Erro ao gerar o link do QR Code. Tentando gerar no terminal...');
+            qrcodeTerminal.generate(qr, { small: true });
+        } else {
+            console.log('############################################################');
+            console.log('### COPIE O LINK ABAIXO E COLE NO SEU NAVEGADOR ###');
+            console.log(url);
+            console.log('############################################################');
+        }
+    });
 });
 client.on('ready', () => { console.log('✅ WhatsApp conectado com sucesso!'); });
 client.initialize();
@@ -383,4 +395,4 @@ async function handleFinancialRequest(userId, chat) {
     await chat.sendStateTyping(); await randomDelay();
     await sendBotMessage(userId, config.messages.financialInfo);
 }
-
+�
