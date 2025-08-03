@@ -3,7 +3,23 @@ const qrcode = require('qrcode-terminal');
 const { Client, MessageMedia } = require('whatsapp-web.js');
 const path = require('path');
 const fetch = require('node-fetch');
-const client = new Client();
+
+// --- MUDANÇA AQUI: Adicionadas opções para resolver o erro de timeout no Replit ---
+const client = new Client({
+    puppeteer: {
+        headless: true,
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-accelerated-2d-canvas',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process',
+            '--disable-gpu'
+        ],
+    }
+});
 
 // ===================================================================================
 // ARQUIVO DE CONFIGURAÇÃO
@@ -234,13 +250,6 @@ function scheduleDailyMessages() {
 client.on('qr', qr => { qrcode.generate(qr, { small: true }); });
 client.on('ready', () => {
     console.log('✅ WhatsApp conectado com sucesso!');
-    
-    // --- MUDANÇA AQUI: Envio de mensagem de teste ---
-    const testNumber = '5511953872843@c.us';
-    const testDueDate = '10/08/2025'; // Data de exemplo
-    const testMessage = config.messages.reminderMessage(testDueDate);
-    console.log(`[SISTEMA] Enviando mensagem de teste de cobrança para ${testNumber}`);
-    sendBotMessage(testNumber, testMessage);
     
     console.log('[SISTEMA] Agendando lembretes recorrentes...');
     config.recurringReminders.forEach(reminder => {
