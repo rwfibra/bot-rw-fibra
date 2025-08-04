@@ -1,11 +1,15 @@
 // Importação das dependências necessárias
 const qrcode = require('qrcode-terminal');
-const { Client, MessageMedia } = require('whatsapp-web.js');
+const { Client, MessageMedia, LocalAuth } = require('whatsapp-web.js'); // <-- MUDANÇA: Importar LocalAuth
 const path = require('path');
 const fetch = require('node-fetch');
 
-// --- MUDANÇA AQUI: Adicionadas opções para resolver o erro de timeout no Replit ---
+// ===================================================================================
+// MUDANÇA IMPORTANTE: Configuração do Cliente para o Render
+// ===================================================================================
+// Esta configuração é ESSENCIAL para rodar em servidores Linux como o Render.
 const client = new Client({
+    authStrategy: new LocalAuth(), // <-- MUDANÇA: Para salvar a sessão e não pedir QR Code toda hora
     puppeteer: {
         headless: true,
         args: [
@@ -15,14 +19,15 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process',
+            '--single-process', // <- Descomente no Kinsta, pode ajudar no Render
             '--disable-gpu'
         ],
     }
 });
 
+
 // ===================================================================================
-// ARQUIVO DE CONFIGURAÇÃO
+// ARQUIVO DE CONFIGURAÇÃO (Seu código original continua aqui)
 // ===================================================================================
 const config = {
     botName: "Daniele",
@@ -247,9 +252,20 @@ function scheduleDailyMessages() {
 // ===================================================================================
 // INICIALIZAÇÃO DO CLIENTE WHATSAPP
 // ===================================================================================
-client.on('qr', qr => { qrcode.generate(qr, { small: true }); });
+client.on('qr', qr => { 
+    console.log('QR Code recebido! Escaneie com seu celular.');
+    qrcode.generate(qr, { small: true }); 
+});
+
 client.on('ready', () => {
     console.log('✅ WhatsApp conectado com sucesso!');
+    
+    // --- MUDANÇA AQUI: Envio de mensagem de teste ---
+    const testNumber = '5511953872843@c.us';
+    const testDueDate = '10/08/2025'; // Data de exemplo
+    const testMessage = config.messages.reminderMessage(testDueDate);
+    console.log(`[SISTEMA] Enviando mensagem de teste de cobrança para ${testNumber}`);
+    sendBotMessage(testNumber, testMessage);
     
     console.log('[SISTEMA] Agendando lembretes recorrentes...');
     config.recurringReminders.forEach(reminder => {
@@ -259,8 +275,9 @@ client.on('ready', () => {
     console.log('[SISTEMA] Agendando mensagens diárias...');
     scheduleDailyMessages();
 });
-client.initialize();
 
+// O resto do seu código continua aqui, sem alterações...
+// ...
 // ===================================================================================
 // LÓGICA DE ATENDIMENTO HUMANO E COMANDOS DO ATENDENTE
 // ===================================================================================
@@ -599,3 +616,6 @@ async function handleFinancialRequest(userId, chat) {
     await chat.sendStateTyping(); await randomDelay();
     await sendBotMessage(userId, config.messages.financialInfo);
 }
+
+// Inicia o cliente
+client.initialize();
