@@ -1,7 +1,7 @@
 {
-  "name": "whatsapp-bot-render",
+  "name": "whatsapp-bot-koyeb",
   "version": "1.0.0",
-  "description": "Bot de WhatsApp para rodar no Render com QR Code via web",
+  "description": "Bot de WhatsApp para rodar no Koyeb com QR Code via web",
   "main": "chatbot.js",
   "scripts": {
     "start": "node chatbot.js"
@@ -14,7 +14,6 @@
     "moment-timezone": "^0.5.45",
     "node-fetch": "^2.7.0",
     "qrcode": "^1.5.3",
-    "qrcode-terminal": "^0.12.0",
     "whatsapp-web.js": "^1.23.0"
   }
 }
