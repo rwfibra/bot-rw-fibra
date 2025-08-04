@@ -9,7 +9,7 @@ const fetch = require('node-fetch');
 // INICIALIZAÇÃO DO SERVIDOR WEB (EXPRESS)
 // ===================================================================================
 const app = express();
-const PORT = process.env.PORT || 3000; // Render fornece a porta via variável de ambiente
+const PORT = process.env.PORT || 3000; // Koyeb fornece a porta via variável de ambiente
 let qrCodeDataUrl = null;
 let botStatus = 'Iniciando...';
 
@@ -40,7 +40,7 @@ app.get('/qr', (req, res) => {
 });
 
 app.listen(PORT, () => {
-    console.log(`[SERVIDOR] Servidor rodando na porta ${PORT}. Acesse a URL fornecida pelo Render.`);
+    console.log(`[SERVIDOR] Servidor rodando na porta ${PORT}. Acesse a URL pública fornecida pelo Koyeb.`);
 });
 
 
@@ -175,7 +175,7 @@ const config = {
         botReactivated: 'Prontinho! Meu atendimento automático foi reativado. 😊 Se precisar de algo, é só chamar!',
         transferToHuman: 'Perfeito! Recebi seus dados. Um de nossos especialistas já foi notificado e entrará em contato com você em breve para finalizar a contratação. Por favor, aguarde um momento. 🧑‍💼',
         transferToSupport: 'Entendido. Nossa equipe técnica já foi notificada sobre o seu problema e entrará em contato em breve para agendar um reparo. Por favor, aguarde um momento. 🧑‍🔧',
-        transferToHumanForTv: "Excelente! 🎉 Um de nossos especialistas em TV já recebeu sua solicitação e vai te chamar em instantes para explicar tudo. Fique de olho! �",
+        transferToHumanForTv: "Excelente! 🎉 Um de nossos especialistas em TV já recebeu sua solicitação e vai te chamar em instantes para explicar tudo. Fique de olho! 😉",
         thankYouReply: 'De nada! 😊 Se precisar de mais alguma coisa, é só chamar!',
         ourPlans: '📦 *Nossos Planos de Internet – RW Fibra:*\n\n' + '🚀 *200 Mega* – R$ 49,90/mês*\n✅ Ideal para navegação básica e streaming.\n\n' + '🚀 *300 Mega* – R$ 79,90/mês\n✅ Perfeito para quem usa vários dispositivos.\n\n' + '🚀 *400 Mega* – R$ 100,00/mês\n✅ Ótima opção para home office e gamers.\n\n' + '🚀 *500 Mega + TV* – R$ 120,00/mês\n✅ Inclui +200 canais de TV grátis!\n\n' + '📌 *Promoção:* Plano de 200 Mega por R$ 49,90 nos dois primeiros meses. Após, R$ 79,90/mês.\n\n' + 'Qual desses planos mais combina com você? Me diga qual a velocidade que te interessou! 😉',
         reminder: 'Olá! Vi que você está de olho nos nossos planos. 👀\n\nQual deles te interessou mais? Me diga a velocidade ou pode perguntar que eu te ajudo. 😊',
@@ -193,7 +193,7 @@ const config = {
         signalBoost: 'Perfeito! Como último passo, vou mandar um reforço de sinal para sua conexão... um momento, por favor.',
         signalBoostConfirmation: 'Prontinho! O reforço de sinal foi enviado. Por favor, verifique se sua conexão melhorou.\n\nO problema foi resolvido? Responda com *sim* ou *não*.',
         financialInfo: 'Para acessar a *2ª via do seu boleto* e outras informações financeiras, visite a *Central do Assinante* em nosso site! 💻\n\nÉ rápido, fácil e seguro.\n\nClique no link abaixo e acesse com seu CPF:\n🔗 www.rwfibra.com.br\n\nQualquer dúvida, é só chamar! 😊',
-        outageMessage: "🚧 *AVISO IMPORTANTE – INTERRUPÇÃO TEMPORÁRIA* 🚧\nOlá! 💬\nTivemos um *rompimento na rede* que afetou o sinal em sua região.\n\nIsso pode acontecer por alguns motivos, como:\n🎈 Pipas\n🌳 Queda de árvores\n🚫 Atos de vandalismo\n\nMas fique tranquilo! 💪\n\n*Nossas equipes já estão no local* e trabalhando com agilidade para resolver o problema *o mais rápido possível*.\n⏱️ *Previsão de normalização: até 5 horas*\n\nVisite nosso site para mais informações:\nwww.rwfibra.com.br\n\nAgradecemos pela compreensão e estamos à disposição se precisar de algo! 🤝",
+        outageMessage: "🚧 *AVISO IMPORTANTE – INTERRUPÇÃO TEMPORÁRIA* 🚧\nOlá! 💬\nTivemos um *rompimento na rede* que afetou o sinal em sua região.\n\nIsso pode acontecer por alguns motivos, como:\n🎈 Pipas\n🌳 Queda de árvores\n🚫 Atos de vandalismo\n\nMas fique tranquilo! �\n\n*Nossas equipes já estão no local* e trabalhando com agilidade para resolver o problema *o mais rápido possível*.\n⏱️ *Previsão de normalização: até 5 horas*\n\nVisite nosso site para mais informações:\nwww.rwfibra.com.br\n\nAgradecemos pela compreensão e estamos à disposição se precisar de algo! 🤝",
         outageModeOn: "✅ *Modo Rompimento ATIVADO*. Todos os clientes que entrarem em contato receberão a mensagem de aviso.",
         outageModeOff: "✅ *Modo Rompimento DESATIVADO*. O bot voltou a operar normalmente.",
         reminderMessage: (dueDate) => `🔔 *AVISO IMPORTANTE – FATURA DISPONÍVEL* 🔔\n\nOi! Passando aqui pra te lembrar que a *fatura* do seu plano de internet já está *disponível para pagamento*! 📡💳\n\n📅 *Vencimento:* ${dueDate}\n\n🧾 Para acessar seu *boleto* é simples e rápido:\n🔗 https://rwfibra.sgp.tsmx.com.br/accounts/central/login\n👉 É só digitar o *CPF do titular* e pronto!\n\n⚠️ Este é um *aviso automático* para te ajudar a manter tudo em dia, sem preocupações.\n\nVisite nosso site: www.rwfibra.com.br\nSe tiver qualquer dúvida, é só chamar. Estamos aqui pra te ajudar! 😊`,
