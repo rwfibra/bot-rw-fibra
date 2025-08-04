@@ -1,15 +1,54 @@
 // Importação das dependências necessárias
-const qrcode = require('qrcode-terminal');
-const { Client, MessageMedia, LocalAuth } = require('whatsapp-web.js'); // <-- MUDANÇA: Importar LocalAuth
+const { Client, MessageMedia, LocalAuth } = require('whatsapp-web.js');
+const qrcode = require('qrcode');
+const express = require('express');
 const path = require('path');
 const fetch = require('node-fetch');
 
 // ===================================================================================
-// MUDANÇA IMPORTANTE: Configuração do Cliente para o Render
+// INICIALIZAÇÃO DO SERVIDOR WEB (EXPRESS)
 // ===================================================================================
-// Esta configuração é ESSENCIAL para rodar em servidores Linux como o Render.
+const app = express();
+const PORT = process.env.PORT || 3000; // Render fornece a porta via variável de ambiente
+let qrCodeDataUrl = null;
+let botStatus = 'Iniciando...';
+
+app.get('/', (req, res) => {
+    res.send(`
+        <div style="font-family: sans-serif; text-align: center; padding-top: 50px; background-color: #f0f0f0; height: 100vh; margin: 0;">
+            <h1>Bot Daniele está rodando!</h1>
+            <p>Status: <strong style="color: #007bff;">${botStatus}</strong></p>
+            ${qrCodeDataUrl ? `<p><a href="/qr" style="display: inline-block; padding: 10px 20px; background-color: #28a745; color: white; text-decoration: none; border-radius: 5px;">Ver QR Code para Conectar</a></p>` : '<p>Bot conectado ou aguardando para gerar o QR Code.</p>'}
+        </div>
+    `);
+});
+
+app.get('/qr', (req, res) => {
+    if (qrCodeDataUrl) {
+        res.send(`
+            <div style="font-family: sans-serif; text-align: center; padding-top: 20px; background-color: #f0f0f0; height: 100vh; margin: 0;">
+                <h2>Escaneie o QR Code abaixo</h2>
+                <p>Abra o WhatsApp no seu celular e escaneie a imagem para conectar.</p>
+                <img src="${qrCodeDataUrl}" alt="QR Code do WhatsApp" style="max-width: 90%; height: auto; border: 1px solid #ccc;">
+                <br><br>
+                <a href="/" style="color: #007bff; text-decoration: none;">Voltar para a página de Status</a>
+            </div>
+        `);
+    } else {
+        res.status(404).send('Bot já conectado ou o QR Code ainda não foi gerado. <a href="/">Volte para a página inicial</a> e atualize.');
+    }
+});
+
+app.listen(PORT, () => {
+    console.log(`[SERVIDOR] Servidor rodando na porta ${PORT}. Acesse a URL fornecida pelo Render.`);
+});
+
+
+// ===================================================================================
+// CONFIGURAÇÃO DO CLIENTE WHATSAPP
+// ===================================================================================
 const client = new Client({
-    authStrategy: new LocalAuth(), // <-- MUDANÇA: Para salvar a sessão e não pedir QR Code toda hora
+    authStrategy: new LocalAuth(),
     puppeteer: {
         headless: true,
         args: [
@@ -19,15 +58,63 @@ const client = new Client({
             '--disable-accelerated-2d-canvas',
             '--no-first-run',
             '--no-zygote',
-            '--single-process', // <- Descomente no Kinsta, pode ajudar no Render
+            '--single-process',
             '--disable-gpu'
         ],
     }
 });
 
+// ===================================================================================
+// EVENTOS DO CLIENTE WHATSAPP
+// ===================================================================================
+
+client.on('qr', async (qr) => {
+    console.log('[SISTEMA] QR Code recebido. Gerando imagem...');
+    botStatus = 'Aguardando escaneamento do QR Code.';
+    qrCodeDataUrl = await qrcode.toDataURL(qr);
+    console.log('[SISTEMA] QR Code disponível no link /qr do seu site.');
+});
+
+client.on('ready', () => {
+    console.log('✅ WhatsApp conectado com sucesso!');
+    botStatus = 'Conectado e pronto!';
+    qrCodeDataUrl = null; // Limpa o QR Code após conectar
+    
+    const testNumber = '5511953872843@c.us';
+    const testDueDate = '10/08/2025';
+    const testMessage = config.messages.reminderMessage(testDueDate);
+    console.log(`[SISTEMA] Enviando mensagem de teste de cobrança para ${testNumber}`);
+    sendBotMessage(testNumber, testMessage);
+    
+    console.log('[SISTEMA] Agendando lembretes recorrentes...');
+    config.recurringReminders.forEach(reminder => {
+        scheduleRecurringReminder(reminder.number, reminder.dueDay, reminder.daysBefore);
+    });
+
+    console.log('[SISTEMA] Agendando mensagens diárias...');
+    scheduleDailyMessages();
+});
+
+client.on('authenticated', () => {
+    console.log('[SISTEMA] Autenticado com sucesso!');
+    botStatus = 'Autenticado. Carregando conversas...';
+    qrCodeDataUrl = null;
+});
+
+client.on('auth_failure', msg => {
+    console.error('[ERRO] Falha na autenticação!', msg);
+    botStatus = `Erro de autenticação: ${msg}`;
+});
+
+client.on('disconnected', (reason) => {
+    console.log('[SISTEMA] Cliente desconectado!', reason);
+    botStatus = 'Desconectado. Tentando reconectar...';
+    client.initialize();
+});
+
 
 // ===================================================================================
-// ARQUIVO DE CONFIGURAÇÃO (Seu código original continua aqui)
+// ARQUIVO DE CONFIGURAÇÃO DO BOT (SUA LÓGICA ORIGINAL)
 // ===================================================================================
 const config = {
     botName: "Daniele",
@@ -88,7 +175,7 @@ const config = {
         botReactivated: 'Prontinho! Meu atendimento automático foi reativado. 😊 Se precisar de algo, é só chamar!',
         transferToHuman: 'Perfeito! Recebi seus dados. Um de nossos especialistas já foi notificado e entrará em contato com você em breve para finalizar a contratação. Por favor, aguarde um momento. 🧑‍💼',
         transferToSupport: 'Entendido. Nossa equipe técnica já foi notificada sobre o seu problema e entrará em contato em breve para agendar um reparo. Por favor, aguarde um momento. 🧑‍🔧',
-        transferToHumanForTv: "Excelente! 🎉 Um de nossos especialistas em TV já recebeu sua solicitação e vai te chamar em instantes para explicar tudo. Fique de olho! 😉",
+        transferToHumanForTv: "Excelente! 🎉 Um de nossos especialistas em TV já recebeu sua solicitação e vai te chamar em instantes para explicar tudo. Fique de olho! �",
         thankYouReply: 'De nada! 😊 Se precisar de mais alguma coisa, é só chamar!',
         ourPlans: '📦 *Nossos Planos de Internet – RW Fibra:*\n\n' + '🚀 *200 Mega* – R$ 49,90/mês*\n✅ Ideal para navegação básica e streaming.\n\n' + '🚀 *300 Mega* – R$ 79,90/mês\n✅ Perfeito para quem usa vários dispositivos.\n\n' + '🚀 *400 Mega* – R$ 100,00/mês\n✅ Ótima opção para home office e gamers.\n\n' + '🚀 *500 Mega + TV* – R$ 120,00/mês\n✅ Inclui +200 canais de TV grátis!\n\n' + '📌 *Promoção:* Plano de 200 Mega por R$ 49,90 nos dois primeiros meses. Após, R$ 79,90/mês.\n\n' + 'Qual desses planos mais combina com você? Me diga qual a velocidade que te interessou! 😉',
         reminder: 'Olá! Vi que você está de olho nos nossos planos. 👀\n\nQual deles te interessou mais? Me diga a velocidade ou pode perguntar que eu te ajudo. 😊',
@@ -248,36 +335,6 @@ function scheduleDailyMessages() {
     });
 }
 
-
-// ===================================================================================
-// INICIALIZAÇÃO DO CLIENTE WHATSAPP
-// ===================================================================================
-client.on('qr', qr => { 
-    console.log('QR Code recebido! Escaneie com seu celular.');
-    qrcode.generate(qr, { small: true }); 
-});
-
-client.on('ready', () => {
-    console.log('✅ WhatsApp conectado com sucesso!');
-    
-    // --- MUDANÇA AQUI: Envio de mensagem de teste ---
-    const testNumber = '5511953872843@c.us';
-    const testDueDate = '10/08/2025'; // Data de exemplo
-    const testMessage = config.messages.reminderMessage(testDueDate);
-    console.log(`[SISTEMA] Enviando mensagem de teste de cobrança para ${testNumber}`);
-    sendBotMessage(testNumber, testMessage);
-    
-    console.log('[SISTEMA] Agendando lembretes recorrentes...');
-    config.recurringReminders.forEach(reminder => {
-        scheduleRecurringReminder(reminder.number, reminder.dueDay, reminder.daysBefore);
-    });
-
-    console.log('[SISTEMA] Agendando mensagens diárias...');
-    scheduleDailyMessages();
-});
-
-// O resto do seu código continua aqui, sem alterações...
-// ...
 // ===================================================================================
 // LÓGICA DE ATENDIMENTO HUMANO E COMANDOS DO ATENDENTE
 // ===================================================================================
@@ -523,7 +580,7 @@ async function handleTvOfferConfirmation(userId, text, chat) {
             console.log(`[VÍDEO] Vídeo do plano de TV enviado como documento para ${userId}.`);
         } catch(e) {
             console.error("Erro detalhado ao enviar o vídeo do plano de TV:", e.message);
-            await sendBotMessage(userId, "Tive um problema para enviar o vídeo, mas já notifiquei um especialista.");
+            await sendBotMessage(userId, "Tive um problema para enviar o vídeo, mas também já notifiquei um especialista.");
         }
 
         await chat.sendStateTyping(); await randomDelay();
@@ -619,3 +676,4 @@ async function handleFinancialRequest(userId, chat) {
 
 // Inicia o cliente
 client.initialize();
+�
