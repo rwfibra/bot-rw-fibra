@@ -1,13 +1,18 @@
 {
-  "name": "bot-daniele",
+  "name": "whatsapp-bot-render",
   "version": "1.0.0",
-  "description": "Chatbot de atendimento para WhatsApp",
+  "description": "Bot de WhatsApp para rodar no Render",
   "main": "chatbot.js",
   "scripts": {
     "start": "node chatbot.js"
   },
+  "engines": {
+    "node": "18.x"
+  },
   "dependencies": {
-    "whatsapp-web.js": "^1.23.0",
-    "node-fetch": "^2.7.0"
+    "moment-timezone": "^0.5.45",
+    "node-fetch": "^2.7.0",
+    "qrcode-terminal": "^0.12.0",
+    "whatsapp-web.js": "^1.23.0"
   }
 }
