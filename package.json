@@ -1,7 +1,7 @@
 {
-  "name": "whatsapp-bot-koyeb",
+  "name": "whatsapp-bot-replit",
   "version": "1.0.0",
-  "description": "Bot de WhatsApp para rodar no Koyeb com QR Code via web",
+  "description": "Bot de WhatsApp para rodar no Replit com QR Code via web",
   "main": "chatbot.js",
   "scripts": {
     "start": "node chatbot.js"
